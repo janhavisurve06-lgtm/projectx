@@ -10,6 +10,7 @@ let mediaRecorder = null;
 let meetingId = null;
 let transcriptBuffer = [];
 let silenceTimer = null;
+let currentStream = null;
 
 chrome.runtime.onMessage.addListener(async (msg) => {
   if (msg.type === "OFFSCREEN_START") {
@@ -34,6 +35,8 @@ async function startStreaming(streamId, dgKey, mId, backendWs) {
       },
       video: false
     });
+    
+    currentStream = stream;
 
     // ── Connect to Deepgram WebSocket ─────────────────────────
     const dgUrl = `wss://api.deepgram.com/v1/listen?` +
@@ -169,6 +172,11 @@ function stopStreaming() {
   }
 
   if (mediaRecorder?.state !== "inactive") mediaRecorder?.stop();
+  
+  if (currentStream) {
+    currentStream.getTracks().forEach(track => track.stop());
+    currentStream = null;
+  }
 
   if (dgSocket) {
     dgSocket.send(JSON.stringify({ type: "CloseStream" }));

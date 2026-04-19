@@ -4,8 +4,22 @@
 // ============================================================
 
 const DEEPGRAM_API_KEY = "d0acdf94478d3d6564f2004b9d42c10cfd8d4007";
-const BACKEND_WS = "ws://localhost:8080/ws/stream";
+// Dynamically fetch config URL
+let BACKEND_URL = "http://localhost:8000";
+let BACKEND_WS = "ws://localhost:8000/ws/stream";
 
+(async () => {
+  try {
+    const txt = await (await fetch(chrome.runtime.getURL('config.js'))).text();
+    const match = txt.match(/API_BASE_URL:\s*"([^"]+)"/);
+    if (match) {
+      BACKEND_URL = match[1];
+      BACKEND_WS = BACKEND_URL.replace('http', 'ws') + "/ws/stream";
+    }
+  } catch (e) {
+    console.error("Config load error", e);
+  }
+})();
 let dgSocket = null;
 let mediaRecorder = null;
 let activeTabId = null;
@@ -88,7 +102,7 @@ function stopCapture() {
 
 async function relayScreenshotToBackend(imageDataUrl, mId) {
   try {
-    await fetch(`http://localhost:8080/meetings/${mId}/screenshots`, {
+    await fetch(`${BACKEND_URL}/meetings/${mId}/screenshots`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ image: imageDataUrl, timestamp: Date.now() })

@@ -38,7 +38,7 @@
         "https://*.zoom.us/*",
         "https://teams.microsoft.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["config.js", "content.js"],
       "css": ["styles/sidebar.css"],
       "run_at": "document_idle"
     }

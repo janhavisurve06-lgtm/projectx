@@ -4,7 +4,7 @@
 // Handles: Sidebar injection, screenshot monitoring, messaging
 // ============================================================
 
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL = CONFIG.API_BASE_URL;
 const SCREENSHOT_INTERVAL_MS = 5000;   // Check every 5s
 const SCREENSHOT_DIFF_THRESHOLD = 0.12; // 12% change = significant
 
